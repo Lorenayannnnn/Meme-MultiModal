@@ -32,7 +32,10 @@ def train(train_loader, hyp_params, model, bert, tokenizer, feature_extractor, o
     for i_batch, data_batch in enumerate(train_loader):
 
         input_ids = data_batch["input_ids"]
-        targets = data_batch["label"]
+        if hyp_params.dataset == 'multi_category_memotion_dataset':
+            targets = data_batch["label"].squeeze(1)
+        else:
+            targets = data_batch["label"]
         images = data_batch['image']
         attention_mask = data_batch['attention_mask']
 
@@ -61,9 +64,7 @@ def train(train_loader, hyp_params, model, bert, tokenizer, feature_extractor, o
             feature_images=feature_images
         )
 
-        if hyp_params.dataset == 'memotion':
-            _, preds = torch.max(outputs, dim=1)
-        elif hyp_params.dataset == 'reddit':
+        if hyp_params.dataset == 'memotion' or hyp_params.dataset == 'reddit' or hyp_params.dataset == 'multi_category_memotion_dataset':
             _, preds = torch.max(outputs, dim=1)
         else:
             preds = outputs
@@ -108,7 +109,10 @@ def evaluate(valid_loader, hyp_params, model, bert, tokenizer, feature_extractor
     with torch.no_grad():
         for i_batch, data_batch in enumerate(loader):
             input_ids = data_batch["input_ids"]
-            targets = data_batch["label"]
+            if hyp_params.dataset == 'multi_category_memotion_dataset':
+                targets = data_batch["label"].squeeze(1)
+            else:
+                targets = data_batch["label"]
             images = data_batch['image']
             attention_mask = data_batch['attention_mask']
 
@@ -137,9 +141,7 @@ def evaluate(valid_loader, hyp_params, model, bert, tokenizer, feature_extractor
                 feature_images=feature_images
             )
 
-            if hyp_params.dataset == 'memotion':
-                _, preds = torch.max(outputs, dim=1)
-            elif hyp_params.dataset == 'reddit':
+            if hyp_params.dataset == 'memotion' or hyp_params.dataset == 'reddit' or hyp_params.dataset == 'multi_category_memotion_dataset':
                 _, preds = torch.max(outputs, dim=1)
             else:
                 preds = outputs

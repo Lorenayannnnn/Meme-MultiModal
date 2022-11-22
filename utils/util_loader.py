@@ -1,14 +1,13 @@
 from .dataset.memotion import *
 from .dataset.reddit import *
+from .dataset.multi_category_memotion import *
 
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import torch
-import os
 
-#dataset = 'memotion'
 
-def data_loader(args, tokenizer, split, debugflag=False):
+def data_loader(args, tokenizer, split, debugflag=False, multicategory_dataframe=None):
 
     if args.dataset == 'memotion':
         dataset = MemotionDataset(
@@ -31,6 +30,19 @@ def data_loader(args, tokenizer, split, debugflag=False):
             args.max_token_length,
             tokenizer,
             )
+    elif args.dataset == 'multi_category_memotion_dataset':
+        dataset = MultiCategoryeMemotionDataset(
+            args.root_path,
+            multicategory_dataframe,
+            args.max_token_length,
+            tokenizer,
+            transform=transforms.Compose([
+                transforms.Resize((256, 256)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                     std=[0.229, 0.224, 0.225]),
+            ])
+        )
     else:
         raise Exception("No matching dataset.")
 

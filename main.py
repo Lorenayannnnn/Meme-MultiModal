@@ -1,8 +1,8 @@
 from utils.util_args import get_args
 from utils.util_loader import data_loader
 from utils.util import save_model, load_model, metrics, write_log
-from utils.util_train import train
 import models
+from models import MultiCategoryMemeModel
 from transformers import BertModel, AlbertModel, AutoConfig
 from transformers import BertTokenizer, AlbertTokenizer, AutoTokenizer
 
@@ -10,33 +10,38 @@ import torch
 from torch import nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-import numpy as np
 import time
 import sys
 import os
+import pandas as pd
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="0, 1, 2, 3"
 
-# TODO
 output_dim_dict = {
     'memotion': 5,
-    'reddit': 2
+    'reddit': 2,
+    'multi_category_memotion_dataset': 7
 }
 
 criterion_dict = {
     'memotion': 'CrossEntropyLoss',
-    'reddit': 'CrossEntropyLoss'
+    'reddit': 'CrossEntropyLoss',
+    'multi_category_memotion_dataset': 'CrossEntropyLoss'
 }
 
 def initiate(hyp_params, tokenizer, train_loader, valid_loader, test_loader=None):
-    model = getattr(models, hyp_params.model+'Model')(hyp_params)
+    if hyp_params.dataset == 'multi_category_memotion_dataset':
+        model = MultiCategoryMemeModel(hyp_params=hyp_params, pretrained_meme_multimodal_model=torch.load(
+            'pretrained_models/{}'.format(hyp_params.pretrained_meme_multimodal_model)))
+    else:
+        model = getattr(models, hyp_params.model+'Model')(hyp_params)
 
     if hyp_params.train_reddit == 1:
         # bert = BertModel.from_pretrained(hyp_params.bert_model)
         bert = AlbertModel.from_pretrained(hyp_params.bert_model)
     else:
-        bert = torch.load('pretrained_models/model.pt')
+        bert = torch.load('pretrained_models/pretrained_albert.pt')
 
     feature_extractor = torch.hub.load('pytorch/vision:v0.6.0', hyp_params.cnn_model,
                                        weights='VGG16_Weights.IMAGENET1K_V1')
@@ -106,7 +111,6 @@ def train_model(settings, hyp_params, train_loader, val_loader, test_loader=None
         end = time.time()
         duration = end-start
         scheduler.step(val_loss)
-        # TODO haha
         train_acc, train_f1, train_f1_macro, train_precision, train_recall = metrics(train_results, train_truths)
         val_acc, val_f1, val_f1_macro, val_precision, val_recall = metrics(results, truths)
         print("-"*100)
@@ -172,9 +176,22 @@ def main():
 
     tokenizer = AutoTokenizer.from_pretrained(args.bert_model)
 
+    multi_category_memotion_df_train = None
+    multi_category_memotion_df_val = None
+    if args.dataset == 'multi_category_memotion_dataset':
+        prop_train = 0.8
+        path = os.path.join(args.root_path, args.dataset_pickle_filepath)
+        multi_category_memotion_df = pd.DataFrame(pd.read_pickle(path))
+        multi_category_memotion_df_train = multi_category_memotion_df.sample(frac=prop_train)
+        multi_category_memotion_df_val = multi_category_memotion_df.drop(multi_category_memotion_df_train.index)
+        multi_category_memotion_df_train = multi_category_memotion_df_train.reset_index()
+        multi_category_memotion_df_val = multi_category_memotion_df_val.reset_index()
+
     print("Start loading the data....")
-    train_loader, train_size = data_loader(args, tokenizer, 'train')
-    val_loader, val_size = data_loader(args, tokenizer, 'test')
+    # args, tokenizer, split, debugflag=False, multicategory_dataframe=None
+    train_loader, train_size = data_loader(args, tokenizer, 'train',
+                                           multicategory_dataframe=multi_category_memotion_df_train)
+    val_loader, val_size = data_loader(args, tokenizer, 'test', multicategory_dataframe=multi_category_memotion_df_val)
     print('Finish loading the data....')
 
     hyp_params = args

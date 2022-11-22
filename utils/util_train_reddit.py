@@ -42,9 +42,7 @@ def train(train_loader, hyp_params, model, bert, tokenizer, feature_extractor, o
             attention_mask=attention_mask
         )
 
-        if hyp_params.dataset == 'memotion':
-            _, preds = torch.max(outputs, dim=1)
-        elif hyp_params.dataset == 'reddit':
+        if hyp_params.dataset == 'memotion' or hyp_params.dataset == 'reddit' or hyp_params.dataset == 'multi_category_memotion_dataset':
             _, preds = torch.max(outputs, dim=1)
         else:
             preds = outputs
@@ -103,9 +101,7 @@ def evaluate(valid_loader, hyp_params, model, bert, tokenizer, feature_extractor
                 attention_mask=attention_mask
             )
 
-            if hyp_params.dataset == 'memotion':
-                _, preds = torch.max(outputs, dim=1)
-            elif hyp_params.dataset == 'reddit':
+            if hyp_params.dataset == 'memotion' or hyp_params.dataset == 'reddit' or hyp_params.dataset == 'multi_category_memotion_dataset':
                 _, preds = torch.max(outputs, dim=1)
             else:
                 preds = outputs

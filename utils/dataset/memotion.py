@@ -1,11 +1,8 @@
 import os
 import torch
-import json
-import numpy as np
 import pandas as pd
 from PIL import Image
 from PIL import ImageFile
-from transformers import BertTokenizer
 from torch.utils.data.dataset import Dataset
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 

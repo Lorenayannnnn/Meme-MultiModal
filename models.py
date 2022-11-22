@@ -1,8 +1,7 @@
 import math
 import torch
 from torch import nn
-import torch.nn.functional as F
-from transformers import BertModel, AlbertModel, AutoConfig
+from transformers import BertModel, AlbertModel
 
 class RedditAlbertModel(nn.Module):
     def __init__(self, hyp_params):
@@ -39,7 +38,7 @@ class RedditBertModel(nn.Module):
 class GatedMultimodalLayer(nn.Module):
     """ Gated Multimodal Layer based on 'Gated multimodal networks, Arevalo1 et al.' (https://arxiv.org/abs/1702.01992) """
     def __init__(self, size_in1, size_in2, size_out):
-        super().__init__()
+        super(GatedMultimodalLayer).__init__()
         self.size_in1, self.size_in2, self.size_out = size_in1, size_in2, size_out
 
         # weight for textual feature: w_t
@@ -126,10 +125,32 @@ class GatedAverageBERTModel(nn.Module):
 
     def forward(self, last_hidden, pooled_output, feature_images):
 
-        mean_hidden = torch.mean(last_hidden, dim = 1)
+        mean_hidden = torch.mean(last_hidden, dim=1)
 
         x = self.gated_linear1(mean_hidden, feature_images)
         x = self.bn1(x)
         x = self.drop1(x)
 
         return self.linear1(x)
+
+
+class MultiCategoryMemeModel(nn.Module):
+
+    def __init__(self, hyp_params, pretrained_meme_multimodal_model):
+        super(MultiCategoryMemeModel, self).__init__()
+        self.pretrained_model = pretrained_meme_multimodal_model
+        self.fc = nn.Linear(512, hyp_params.output_dim)
+
+    @torch.no_grad()
+    def get_pretrained_model_output(self, last_hidden, pooled_output, feature_images):
+        mean_hidden = torch.mean(last_hidden, dim=1)
+
+        x = self.pretrained_model.gated_linear1(mean_hidden, feature_images)
+        x = self.pretrained_model.bn1(x)
+        x = self.pretrained_model.drop1(x)
+        return x
+
+    def forward(self, last_hidden, pooled_output, feature_images):
+        outputs = self.get_pretrained_model_output(last_hidden, pooled_output, feature_images)
+
+        return self.fc(outputs)

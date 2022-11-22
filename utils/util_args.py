@@ -20,6 +20,10 @@ def get_args():
                         help='name of the model to use (Transformer, etc.)')
     parser.add_argument('--bert_model', type=str, default="albert-base-v2",
                         help='pretrained bert model to use')
+    parser.add_argument('--dataset_pickle_filepath', type=str, default='multi_category_meme_data.pkl',
+                        help='pkl file containing multi category meme data')
+    parser.add_argument('--pretrained_meme_multimodal_model', type=str, default='model_w_memotion.pt',
+                        help='checkpoint file containing pretrained meme multimodal model')
     # parser.add_argument('--bert_model', type=str, default="bert-base-uncased",
     #                    help='pretrained bert model to use')
 
@@ -60,7 +64,7 @@ def get_args():
                         help='random seed')
     parser.add_argument('--no_cuda', action='store_true',
                         help='do not use cuda')
-    parser.add_argument('--name', type=str, default='model_w_memotion',
+    parser.add_argument('--name', type=str, default='multi_category_meme_model',
                         help='name of the trial (default: "model")')
     parser.add_argument('--num_workers', type=int, default=0,
                         help='number of workers to use for DataLoaders (default: 6)')
