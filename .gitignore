@@ -130,4 +130,5 @@ dmypy.json
 
 .DS_Store
 .idea/
-data/
+data/memotion
+data/Multi_category_Meme/images
