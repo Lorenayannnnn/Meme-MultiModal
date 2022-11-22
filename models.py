@@ -114,7 +114,6 @@ class ConcatBERTModel(nn.Module):
 
         return self.linear2(x)
 
-
 class GatedAverageBERTModel(nn.Module):
 
     def __init__(self, hyp_params):

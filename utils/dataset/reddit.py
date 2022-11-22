@@ -19,7 +19,7 @@ class RedditDataset(Dataset):
     def __init__(self, root_dir, split, model_name, max_len, tokenizer):
         # Metadata
         self.full_data_path = os.path.join(root_dir, dataset) + "/{}".format(split) + "/{}.tsv".format(split)
-        self.data_dict = pd.read_csv(self.full_data_path, sep='\t',encoding="utf-8")
+        self.data_dict = pd.read_csv(self.full_data_path, sep=',', encoding="utf-8")
         self.root_dir = root_dir
         self.dataset = dataset
         self.split = split
@@ -34,15 +34,15 @@ class RedditDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        label = self.data_dict.iloc[idx,0]
+        label = self.data_dict.iloc[idx, 1]
 
-        text = str(self.data_dict.iloc[idx,1])
+        text = str(self.data_dict.iloc[idx, 3])
         text_encoded = self.tokenizer.encode_plus(
             text,
             add_special_tokens=True,
             max_length=self.max_len,
             return_token_type_ids=False,
-            pad_to_max_length=True,
+            padding='max_length',
             return_attention_mask=True,
             return_tensors='pt',
         )

@@ -55,7 +55,6 @@ def train(train_loader, hyp_params, model, bert, tokenizer, feature_extractor, o
 
         bert.bert.register_forward_hook(get_activation('last', 'pool'))
         outputs = bert(input_ids, attention_mask)
-
         outputs = model(
             last_hidden=activation['last'],
             pooled_output=activation['pool'],

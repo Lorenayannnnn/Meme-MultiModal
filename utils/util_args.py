@@ -12,11 +12,11 @@ def get_args():
     parser = argparse.ArgumentParser(description='Memotion Humor Detection')
 
     # Need to modify 
-    parser.add_argument('--train_reddit', type=int, default=1,
+    parser.add_argument('--train_reddit', type=int, default=0,
                         help='train reddit model (default: 1)')
-    parser.add_argument('--dataset', type=str, default='reddit',
+    parser.add_argument('--dataset', type=str, default='memotion',
                         help='dataset to use (default: memotion)')
-    parser.add_argument('--model', type=str, default='RedditAlbert',
+    parser.add_argument('--model', type=str, default='GatedAverageBERT',
                         help='name of the model to use (Transformer, etc.)')
     parser.add_argument('--bert_model', type=str, default="albert-base-v2",
                         help='pretrained bert model to use')
@@ -38,9 +38,9 @@ def get_args():
                         help='fully connected layers dropout')
 
     # Network Hyper-parameters
-    parser.add_argument('--batch_size', type=int, default=32, metavar='N',
+    parser.add_argument('--batch_size', type=int, default=256, metavar='N',
                         help='batch size (default: 2)')
-    parser.add_argument('--max_token_length', type=int, default=128,
+    parser.add_argument('--max_token_length', type=int, default=50,
                         help='max number of tokens per sentence (default: 50)')
     parser.add_argument('--clip', type=float, default=0.8,
                         help='gradient clip value (default: 0.8)')
@@ -60,7 +60,7 @@ def get_args():
                         help='random seed')
     parser.add_argument('--no_cuda', action='store_true',
                         help='do not use cuda')
-    parser.add_argument('--name', type=str, default='model',
+    parser.add_argument('--name', type=str, default='model_w_memotion',
                         help='name of the trial (default: "model")')
     parser.add_argument('--num_workers', type=int, default=0,
                         help='number of workers to use for DataLoaders (default: 6)')

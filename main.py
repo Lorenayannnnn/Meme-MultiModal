@@ -1,6 +1,7 @@
 from utils.util_args import get_args
 from utils.util_loader import data_loader
 from utils.util import save_model, load_model, metrics, write_log
+from utils.util_train import train
 import models
 from transformers import BertModel, AlbertModel, AutoConfig
 from transformers import BertTokenizer, AlbertTokenizer, AutoTokenizer
@@ -15,10 +16,11 @@ import sys
 import os
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0,1"
+os.environ["CUDA_VISIBLE_DEVICES"]="0, 1, 2, 3"
 
+# TODO
 output_dim_dict = {
-    'memotion': 2,
+    'memotion': 5,
     'reddit': 2
 }
 
@@ -34,9 +36,10 @@ def initiate(hyp_params, tokenizer, train_loader, valid_loader, test_loader=None
         # bert = BertModel.from_pretrained(hyp_params.bert_model)
         bert = AlbertModel.from_pretrained(hyp_params.bert_model)
     else:
-        bert = torch.load('pre_trained_models/model_A1.pt')
+        bert = torch.load('pretrained_models/model.pt')
 
-    feature_extractor = torch.hub.load('pytorch/vision:v0.6.0', hyp_params.cnn_model, pretrained=True)
+    feature_extractor = torch.hub.load('pytorch/vision:v0.6.0', hyp_params.cnn_model,
+                                       weights='VGG16_Weights.IMAGENET1K_V1')
     
     for param in feature_extractor.features.parameters():
         param.requires_grad = False
@@ -76,7 +79,6 @@ def train_model(settings, hyp_params, train_loader, val_loader, test_loader=None
     criterion = settings['criterion']
 
     scheduler = settings['scheduler']
-
     best_valid = 1e8
     for epoch in range(1, hyp_params.num_epochs+1):
         start = time.time()
@@ -104,6 +106,7 @@ def train_model(settings, hyp_params, train_loader, val_loader, test_loader=None
         end = time.time()
         duration = end-start
         scheduler.step(val_loss)
+        # TODO haha
         train_acc, train_f1, train_f1_macro, train_precision, train_recall = metrics(train_results, train_truths)
         val_acc, val_f1, val_f1_macro, val_precision, val_recall = metrics(results, truths)
         print("-"*100)

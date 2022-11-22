@@ -13,13 +13,21 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 Image.MAX_IMAGE_PIXELS = 1000000000
 dataset = 'memotion'
 
+memotion_sentiment_2_index = {
+    "very_negative": 0,
+    "negative": 1,
+    "neutral": 2,
+    "positive": 3,
+    "very_positive": 4
+}
+
 class MemotionDataset(Dataset):
     """Memotion dataset proposed by SEMEVAL-2020"""
     
     def __init__(self, root_dir, split, model_name, max_len, tokenizer, transform=None):
         # Metadata
-        self.full_data_path = os.path.join(root_dir, dataset) + "/{}".format(split) + "/{}.tsv".format(split)
-        self.data_dict = pd.read_csv(self.full_data_path, sep='\t')
+        self.full_data_path = os.path.join(root_dir, dataset) + "/{}".format(split) + "/{}.csv".format(split)
+        self.data_dict = pd.read_csv(self.full_data_path, sep=',')
         self.root_dir = root_dir
         self.dataset = dataset
         self.transform = transform
@@ -35,19 +43,20 @@ class MemotionDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        img_name = self.root_dir+'/'+self.dataset + "/{}".format(self.split) + '/images/' + self.data_dict.iloc[idx,0]
+        img_name = self.root_dir+'/'+self.dataset + "/{}".format(self.split) + '/images/' + self.data_dict.iloc[idx, 1]
         image = Image.open(img_name).convert('RGB')
-        label = self.data_dict.iloc[idx,2]
+        label = memotion_sentiment_2_index[self.data_dict.iloc[idx, 8]]
 
-        text = str(self.data_dict.iloc[idx,1])
+        text = str(self.data_dict.iloc[idx, 2])
         text_encoded = self.tokenizer.encode_plus(
             text,
             add_special_tokens=True,
             max_length=self.max_len,
             return_token_type_ids=False,
-            pad_to_max_length=True,
+            padding='max_length',
             return_attention_mask=True,
             return_tensors='pt',
+            truncation=True
         )
 
         if self.transform:

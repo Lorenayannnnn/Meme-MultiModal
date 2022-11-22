@@ -38,20 +38,21 @@ def data_loader(args, tokenizer, split, debugflag=False):
         dataset_loader = DataLoader(
             dataset,
             batch_size=8,
-            num_workers=args.num_workers
+            num_workers=args.num_workers,
+            generator=torch.Generator(device='cuda')
         )
     else:
         dataset_loader = DataLoader(dataset,
                                     batch_size=args.batch_size,
                                     shuffle=True,
-                                    num_workers=args.num_workers)
+                                    num_workers=args.num_workers,
+                                    generator=torch.Generator(device='cuda'))
     return dataset_loader, len(dataset)
 
 def get_data(args, split='train'):
     if split == 'val':
         return None
     else:
-        root_path = args.root_path
         data = MemotionDataset(args.root_path,
                                split,
                                args.bert_model,
