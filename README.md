@@ -1,3 +1,12 @@
+# Multi-category meme model
+1. Dataset Preparation:
+   1. Reddit Dataset from [this repository](https://github.com/orionw/RedditHumorDetection)
+   2. Memotion Dataset from [kaggle](https://www.kaggle.com/williamscott701/memotion-dataset-7k)
+   3. Eimages from MET-Meme: A Multi-modal Meme Dataset Rich in Metaphors
+2. Train ALBERT using Reddit dataset
+3. Train multi-category meme model with Memotion dataset
+4. Add classification head to the model and run with data from from MET-Meme for memes with multi emotion category
+
 # Memotion Multi-Modal Model (M4 Model)
 The growing ubiquity of Internet memes on social media platforms, such as Facebook, Twitter, Instagram and Reddit have become a unstoppable trend. Comprising of visual and textual information, memes typically convey various emotion (e.g. humor, sarcasm, offensive, motivational, and sentiment). Nevertheless, there is not much research attention toward meme emotion analysis. The main objective of this project is to bring the attention of the research community toward meme studying. In this project, we propose the **M**e**m**otion **M**ulti**m**odal Model (M4 Model) newtork for humor detection on [memotion dataset](https://arxiv.org/pdf/2008.03781.pdf). Inspired by [ConcatBERT model](https://github.com/IsaacRodgz/ConcatBERT), we propose our model while the core "Gated Multimodal Layer" (GML) are borrowed by this [arXiv paper](https://arxiv.org/pdf/1702.01992.pdf)
 
