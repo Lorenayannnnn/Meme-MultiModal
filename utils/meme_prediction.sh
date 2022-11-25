@@ -1,0 +1,1 @@
+python meme_prediction.py --meme_image_dir=data/YOUR_IMAGE_DIRECTORY_NAME/

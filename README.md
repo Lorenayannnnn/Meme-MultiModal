@@ -1,26 +1,52 @@
 # Multi-category meme model
-1. Dataset Preparation:
-   1. Reddit Dataset from [this repository](https://github.com/orionw/RedditHumorDetection)
-   2. Memotion Dataset from [kaggle](https://www.kaggle.com/williamscott701/memotion-dataset-7k)
-   3. Eimages from MET-Meme: A Multi-modal Meme Dataset Rich in Metaphors
-2. Train ALBERT using Reddit dataset
-3. Train multi-category meme model with Memotion dataset
-4. Add classification head to the model and run with data from from MET-Meme for memes with multi emotion category
+## Dataset Preparation:
+1. Reddit Dataset from [this repository](https://github.com/orionw/RedditHumorDetection)
+    Put splitted data under data/reddit directory
+2. Memotion Dataset from [kaggle](https://www.kaggle.com/williamscott701/memotion-dataset-7k)
+    Put splitted data under data/memotion directory
+3. Eimages from MET-Meme: A Multi-modal Meme Dataset Rich in Metaphors
+   Meme class:  happiness(1);love(2);anger(3);sorrow(4);fear(5);hate(6);surprise(7).
+   Put images under data/Multi_category_Meme/images/ and csv files directly under data/Multi_category_Meme
 
-# Memotion Multi-Modal Model (M4 Model)
+## Models Pretraining
+1. Pretrain ALBERT and Multi-Modal models by following instructions in [Memotion Multi-Modal Model](#memotion-multi-modal-model-m4-model) section.
+2. Preprocess Eimages data:
+    ```
+    python utils/multi_category_meme_data_to_pkl.py
+    ```
+3. Train model for multi category meme sentiment analysis
+    ```
+    bash utils/run_model_w_multi_category_meme.sh
+    ```
+Pretrained models and results will be stored in the [pretrained_models](pretrained_models) directory.
+
+## Usage
+1. Create a directory and store your meme images under the [data](data) directory.
+2. Go to [utils/meme_prediction.sh](utils/meme_prediction.sh) and change **_YOUR_IMAGE_DIRECTORY_NAME_** to the name of the directory you just created
+3. Run the following script to first preprocess your meme images
+    ```
+    bash utils.meme_prediction.sh
+    ```
+    Probability distribution of each meme image over 7 sentiment classes will be stored in [meme_filename_to_prob_dist.json](data/meme_filename_to_prob_dist.json) file
+4. 
+
+
+
+<br/><br/><br/>
+## Memotion Multi-Modal Model (M4 Model)
 The growing ubiquity of Internet memes on social media platforms, such as Facebook, Twitter, Instagram and Reddit have become a unstoppable trend. Comprising of visual and textual information, memes typically convey various emotion (e.g. humor, sarcasm, offensive, motivational, and sentiment). Nevertheless, there is not much research attention toward meme emotion analysis. The main objective of this project is to bring the attention of the research community toward meme studying. In this project, we propose the **M**e**m**otion **M**ulti**m**odal Model (M4 Model) newtork for humor detection on [memotion dataset](https://arxiv.org/pdf/2008.03781.pdf). Inspired by [ConcatBERT model](https://github.com/IsaacRodgz/ConcatBERT), we propose our model while the core "Gated Multimodal Layer" (GML) are borrowed by this [arXiv paper](https://arxiv.org/pdf/1702.01992.pdf)
 
 <p align="center">
   <img src="https://github.com/terenceylchow124/Meme-MultiModal/blob/main/Project.jpg" width="550" height="300">
 </p>
 
-# Dataset Preparation 
+### Dataset Preparation 
 In this project, memotion Dataset are mainly used while we apply transfer learning using Reddit Dataset.
 1. Download offical Memotion Dataset from [kaggle](https://www.kaggle.com/williamscott701/memotion-dataset-7k)
 2. Download and prepare sampled Reddit Dataset from [this repository](https://github.com/orionw/RedditHumorDetection)
 3. Put your Reddit and Memotion Dataset to ./data/reddit and ./data/memotion accordingly. 
 
-# Procedures
+### Procedures
 1. Training the ALBERT model using Reddit Dataset.  
   > - go to utils/util_args/
   > - set "train_reddit" to 1
@@ -37,7 +63,7 @@ In this project, memotion Dataset are mainly used while we apply transfer learni
   > - load the pretrained bert model by modify the model name in initiate() function of main.py.
   > - run "python main.py"
 
-# Pretrained Model 
+### Pretrained Model 
 Resulted log files can be found under pretrained_models/. 
 | Variant      | Model      | Task          | Test Acc % | Macro-F1 %  | Benchmark % | Download Link |
 | ------------ | ---------- | ------------- | ---------- | ----------------- | ----------- | ----- |
@@ -45,7 +71,9 @@ Resulted log files can be found under pretrained_models/.
 | A2 (GML)     | ALBERT+FC+VGG16  | Memotion      | 68.32      | 54.57             | [52.99 (F1)](https://arxiv.org/pdf/2008.03781.pdf)  | [:white_check_mark:](https://drive.google.com/file/d/1ZF__AM2xoDfN941oa18kRGDTDWwULy_n/view?usp=sharing) |
  
 # Acknowledgment
-This code is partial borrowed from [ConcatBERT model](https://github.com/IsaacRodgz/ConcatBERT).
+This code is partial borrowed from:
+- [ConcatBERT model](https://github.com/IsaacRodgz/ConcatBERT).
+- [Meme-MultiModal](https://github.com/terenceylchow124/Meme-MultiModal)
 
 
 

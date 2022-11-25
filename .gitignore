@@ -131,4 +131,6 @@ dmypy.json
 .DS_Store
 .idea/
 data/memotion
-data/Multi_category_Meme/images
+data/Multi_category_Meme/*
+data/reddit/*
+data/meme_filename_to_prob_dist.json
